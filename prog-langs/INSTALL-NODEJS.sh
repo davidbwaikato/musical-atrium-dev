@@ -1,0 +1,106 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+SCHWARZMAN_NODE_SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
+SCHWARZMAN_DEV_ROOT="$(cd -- "$SCHWARZMAN_NODE_SCRIPT_DIR/.." && pwd -P)"
+
+source "$SCHWARZMAN_DEV_ROOT/versions.env"
+source "$SCHWARZMAN_NODE_SCRIPT_DIR/_common.bash"
+
+schwarzman_dev_detect_host
+
+case "$SCHWARZMAN_DEV_OS" in
+  linux|darwin)
+    SCHWARZMAN_NODE_PLATFORM="$SCHWARZMAN_DEV_OS"
+    SCHWARZMAN_NODE_ARCHIVE_EXTENSION="tar.xz"
+    ;;
+  win)
+    SCHWARZMAN_NODE_PLATFORM="win"
+    SCHWARZMAN_NODE_ARCHIVE_EXTENSION="zip"
+    ;;
+esac
+
+SCHWARZMAN_NODE_DIST_NAME="node-v${SCHWARZMAN_ATRIUM_NODE_VERSION}-${SCHWARZMAN_NODE_PLATFORM}-${SCHWARZMAN_DEV_ARCH}"
+SCHWARZMAN_NODE_ARCHIVE_NAME="${SCHWARZMAN_NODE_DIST_NAME}.${SCHWARZMAN_NODE_ARCHIVE_EXTENSION}"
+SCHWARZMAN_NODE_DOWNLOAD_DIR="$SCHWARZMAN_NODE_SCRIPT_DIR/downloads/nodejs"
+SCHWARZMAN_NODE_INSTALL_PARENT="$SCHWARZMAN_NODE_SCRIPT_DIR/installed"
+SCHWARZMAN_NODE_INSTALL_DIR="$SCHWARZMAN_NODE_INSTALL_PARENT/$SCHWARZMAN_NODE_DIST_NAME"
+SCHWARZMAN_NODE_ARCHIVE_PATH="$SCHWARZMAN_NODE_DOWNLOAD_DIR/$SCHWARZMAN_NODE_ARCHIVE_NAME"
+SCHWARZMAN_NODE_CHECKSUMS_PATH="$SCHWARZMAN_NODE_DOWNLOAD_DIR/SHASUMS256-v${SCHWARZMAN_ATRIUM_NODE_VERSION}.txt"
+SCHWARZMAN_NODE_BASE_URL="https://nodejs.org/dist/v${SCHWARZMAN_ATRIUM_NODE_VERSION}"
+
+if [[ "$SCHWARZMAN_DEV_OS" == "win" ]]; then
+  SCHWARZMAN_NODE_EXECUTABLE="$SCHWARZMAN_NODE_INSTALL_DIR/node.exe"
+else
+  SCHWARZMAN_NODE_EXECUTABLE="$SCHWARZMAN_NODE_INSTALL_DIR/bin/node"
+fi
+
+if [[ -x "$SCHWARZMAN_NODE_EXECUTABLE" ]]; then
+  SCHWARZMAN_NODE_ACTUAL_VERSION="$("$SCHWARZMAN_NODE_EXECUTABLE" --version)"
+  if [[ "$SCHWARZMAN_NODE_ACTUAL_VERSION" == "v${SCHWARZMAN_ATRIUM_NODE_VERSION}" ]]; then
+    printf 'Node.js %s is already installed for %s-%s.\n' \
+      "$SCHWARZMAN_NODE_ACTUAL_VERSION" "$SCHWARZMAN_DEV_OS" "$SCHWARZMAN_DEV_ARCH"
+    exit 0
+  fi
+fi
+
+mkdir -p "$SCHWARZMAN_NODE_DOWNLOAD_DIR" "$SCHWARZMAN_NODE_INSTALL_PARENT"
+
+if [[ -d "$SCHWARZMAN_NODE_INSTALL_DIR" ]]; then
+  SCHWARZMAN_NODE_BACKUP="${SCHWARZMAN_NODE_INSTALL_DIR}.incomplete.$(date +%Y%m%d%H%M%S)"
+  printf 'Preserving incomplete installation as %s\n' "$SCHWARZMAN_NODE_BACKUP"
+  schwarzman_dev_move_with_retry "$SCHWARZMAN_NODE_INSTALL_DIR" "$SCHWARZMAN_NODE_BACKUP"
+fi
+
+if [[ ! -f "$SCHWARZMAN_NODE_CHECKSUMS_PATH" ]]; then
+  printf 'Downloading Node.js checksum manifest...\n'
+  schwarzman_dev_download \
+    "$SCHWARZMAN_NODE_BASE_URL/SHASUMS256.txt" \
+    "$SCHWARZMAN_NODE_CHECKSUMS_PATH"
+fi
+
+if [[ ! -f "$SCHWARZMAN_NODE_ARCHIVE_PATH" ]]; then
+  printf 'Downloading %s...\n' "$SCHWARZMAN_NODE_ARCHIVE_NAME"
+  schwarzman_dev_download \
+    "$SCHWARZMAN_NODE_BASE_URL/$SCHWARZMAN_NODE_ARCHIVE_NAME" \
+    "$SCHWARZMAN_NODE_ARCHIVE_PATH"
+fi
+
+if ! schwarzman_dev_verify_node_archive \
+  "$SCHWARZMAN_NODE_ARCHIVE_PATH" "$SCHWARZMAN_NODE_CHECKSUMS_PATH"; then
+  printf 'Cached Node.js files failed verification; downloading them again.\n' >&2
+  rm -f -- "$SCHWARZMAN_NODE_ARCHIVE_PATH" "$SCHWARZMAN_NODE_CHECKSUMS_PATH"
+  schwarzman_dev_download \
+    "$SCHWARZMAN_NODE_BASE_URL/SHASUMS256.txt" \
+    "$SCHWARZMAN_NODE_CHECKSUMS_PATH"
+  schwarzman_dev_download \
+    "$SCHWARZMAN_NODE_BASE_URL/$SCHWARZMAN_NODE_ARCHIVE_NAME" \
+    "$SCHWARZMAN_NODE_ARCHIVE_PATH"
+  schwarzman_dev_verify_node_archive \
+    "$SCHWARZMAN_NODE_ARCHIVE_PATH" "$SCHWARZMAN_NODE_CHECKSUMS_PATH"
+fi
+
+SCHWARZMAN_NODE_STAGE="$(mktemp -d "${TMPDIR:-/tmp}/schwarzman-node.XXXXXX")"
+cleanup_schwarzman_node_stage() {
+  rm -rf -- "$SCHWARZMAN_NODE_STAGE"
+}
+trap cleanup_schwarzman_node_stage EXIT
+
+printf 'Installing Node.js locally...\n'
+schwarzman_dev_extract_archive "$SCHWARZMAN_NODE_ARCHIVE_PATH" "$SCHWARZMAN_NODE_STAGE"
+
+SCHWARZMAN_NODE_EXTRACTED_DIR="$SCHWARZMAN_NODE_STAGE/$SCHWARZMAN_NODE_DIST_NAME"
+[[ -d "$SCHWARZMAN_NODE_EXTRACTED_DIR" ]] || {
+  schwarzman_dev_die "Expected extracted directory was not found: $SCHWARZMAN_NODE_EXTRACTED_DIR"
+  exit 1
+}
+
+schwarzman_dev_move_with_retry "$SCHWARZMAN_NODE_EXTRACTED_DIR" "$SCHWARZMAN_NODE_INSTALL_DIR"
+
+[[ -x "$SCHWARZMAN_NODE_EXECUTABLE" ]] || {
+  schwarzman_dev_die "Node.js installation did not produce $SCHWARZMAN_NODE_EXECUTABLE"
+  exit 1
+}
+
+printf 'Installed Node.js %s in %s\n' \
+  "$("$SCHWARZMAN_NODE_EXECUTABLE" --version)" "$SCHWARZMAN_NODE_INSTALL_DIR"

@@ -1,0 +1,8 @@
+.DS_Store
+Thumbs.db
+
+prog-langs/downloads/*
+!prog-langs/downloads/.gitkeep
+
+prog-langs/installed/*
+!prog-langs/installed/.gitkeep
