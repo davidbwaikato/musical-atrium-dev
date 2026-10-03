@@ -6,3 +6,5 @@ prog-langs/downloads/*
 
 prog-langs/installed/*
 !prog-langs/installed/.gitkeep
+
+prog-langs/python3-for-tma/

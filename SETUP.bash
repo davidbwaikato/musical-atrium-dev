@@ -7,6 +7,7 @@ fi
 
 SCHWARZMAN_SETUP_ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 source "$SCHWARZMAN_SETUP_ROOT/prog-langs/ACTIVATE-NODEJS.bash" || return 1
+source "$SCHWARZMAN_SETUP_ROOT/prog-langs/ACTIVATE-PYTHON.bash" || return 1
 
 printf 'Activated Node.js %s\n' "$(node --version)"
 if command -v pnpm >/dev/null 2>&1; then
@@ -15,5 +16,6 @@ else
   printf 'pnpm is not installed yet; run %s/INSTALL-DEV-TOOLS-ALL.sh\n' \
     "$SCHWARZMAN_SETUP_ROOT" >&2
 fi
+printf 'Activated Python %s (%s)\n' "$(python --version 2>&1)" "$SCHWARZMAN_ATRIUM_PYTHON_VENV"
 
 unset SCHWARZMAN_SETUP_ROOT

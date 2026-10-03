@@ -1,0 +1,9 @@
+# The baseline audio/score analysis environment. Keep librosa 0.11 for
+# Sync Toolbox's declared compatibility range. Model weights download separately.
+librosa==0.11.0
+synctoolbox==1.4.2
+demucs-infer==4.2.2
+partitura==1.9.0
+parangonar==3.3.3
+pyloudnorm==0.1.1
+soundfile>=0.13,<1

@@ -35,8 +35,11 @@ SCHWARZMAN_ACTUAL_PNPM_VERSION="$(pnpm --version)"
   exit 1
 }
 
+"$SCHWARZMAN_INSTALL_ROOT/prog-langs/INSTALL-PYTHON.sh"
+
 printf '\nDevelopment tools are ready.\n'
 printf '  Node.js: %s\n' "$SCHWARZMAN_ACTUAL_NODE_VERSION"
 printf '  pnpm:    %s\n' "$SCHWARZMAN_ACTUAL_PNPM_VERSION"
+printf '  Python:  %s (%s)\n' "$SCHWARZMAN_ATRIUM_PYTHON_VERSION" "$SCHWARZMAN_ATRIUM_PYTHON_VENV"
 printf '\nActivate them in each new shell with:\n'
 printf '  source %q/SETUP.bash\n' "$SCHWARZMAN_INSTALL_ROOT"
