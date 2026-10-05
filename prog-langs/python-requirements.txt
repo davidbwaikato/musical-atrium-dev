@@ -7,3 +7,7 @@ partitura==1.9.0
 parangonar==3.3.3
 pyloudnorm==0.1.1
 soundfile>=0.13,<1
+# YouTube acquisition: yt-dlp's default extra includes its EJS scripts. The
+# project-local Node.js is used to run them; imageio-ffmpeg supplies FFmpeg.
+yt-dlp[default]==2026.8.19
+imageio-ffmpeg==0.6.0

@@ -10,7 +10,11 @@ This repository is intended to be checked out as the `dev/` Git submodule of the
 
 The installer downloads official Node.js archives, verifies them against the corresponding `SHASUMS256.txt`, and unpacks them beneath `prog-langs/installed/`. It also installs a pinned portable CPython build from python-build-standalone, verifies its published `SHA256SUMS`, and creates `prog-langs/python3-for-tma/`. Python packages are installed into that virtual environment. Re-running the installer reuses the Python archive and installation; pip checks the pinned requirements again.
 
-The baseline Python packages include librosa 0.11, Sync Toolbox, Demucs inference, Partitura, Parangonar, pyloudnorm and SoundFile. Model weights (including Demucs weights) are obtained separately when those algorithms are used. Essentia is installed on Linux x64 with glibc and supported macOS hosts. Native Windows Git Bash prints a warning and skips Essentia. The pinned Essentia wheel supports CPython 3.12 on Linux x64 (glibc), macOS x64 13+, and macOS ARM64 15+; other hosts receive a warning. The installer does not include the separate `essentia-tensorflow` package or its trained models.
+The baseline Python packages include librosa 0.11, Sync Toolbox, Demucs inference, Partitura, Parangonar, pyloudnorm and SoundFile. Model weights (including Demucs weights) are obtained separately when those algorithms are used.
+
+For the main project's YouTube-ID audio download script, the environment installs `yt-dlp[default]` (including its EJS challenge scripts) and `imageio-ffmpeg`, whose wheels bundle an FFmpeg executable on the main supported platforms. The project-local Node.js runs the EJS scripts; this workflow does not need Playwright or Chromium. The `imageio-ffmpeg` 0.6.0 distribution has no bundled Windows ARM64 executable, so WAV conversion on that host needs a separate `ffmpeg` executable.
+
+Essentia is installed on Linux x64 with glibc and supported macOS hosts. Native Windows Git Bash prints a warning and skips Essentia. The pinned Essentia wheel supports CPython 3.12 on Linux x64 (glibc), macOS x64 13+, and macOS ARM64 15+; other hosts receive a warning. The installer does not include the separate `essentia-tensorflow` package or its trained models.
 
 ## Add as a submodule
 
