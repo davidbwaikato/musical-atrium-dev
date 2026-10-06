@@ -10,7 +10,7 @@ This repository is intended to be checked out as the `dev/` Git submodule of the
 
 The installer downloads official Node.js archives, verifies them against the corresponding `SHASUMS256.txt`, and unpacks them beneath `prog-langs/installed/`. It also installs a pinned portable CPython build from python-build-standalone, verifies its published `SHA256SUMS`, and creates `prog-langs/python3-for-tma/`. Python packages are installed into that virtual environment. Re-running the installer reuses the Python archive and installation; pip checks the pinned requirements again.
 
-The baseline Python packages include librosa 0.11, Sync Toolbox, Demucs inference, Partitura, Parangonar, pyloudnorm and SoundFile. Model weights (including Demucs weights) are obtained separately when those algorithms are used.
+The Python environment includes FastAPI and Uvicorn for the local server, plus librosa 0.11, Sync Toolbox, Demucs inference, Partitura, Parangonar, pyloudnorm and SoundFile for analysis. Model weights (including Demucs weights) are obtained separately when those algorithms are used.
 
 For the main project's YouTube-ID audio download script, the environment installs `yt-dlp[default]` (including its EJS challenge scripts) and `imageio-ffmpeg`, whose wheels bundle an FFmpeg executable on the main supported platforms. The project-local Node.js runs the EJS scripts; this workflow does not need Playwright or Chromium. The `imageio-ffmpeg` 0.6.0 distribution has no bundled Windows ARM64 executable, so WAV conversion on that host needs a separate `ffmpeg` executable.
 
@@ -39,7 +39,7 @@ Run the single installer from the application repository:
 ./dev/INSTALL-DEV-TOOLS-ALL.sh
 ```
 
-The installer downloads anything that is absent, installs Node.js and Python locally, provisions pnpm through a project-local Corepack cache, and installs the Python requirements. To install or refresh only Python, run `./dev/prog-langs/INSTALL-PYTHON.sh`.
+The installer downloads anything that is absent, installs Node.js and Python locally, provisions pnpm through a project-local Corepack cache, and installs the Python requirements, including the server packages. To install or refresh only Python, run `./dev/prog-langs/INSTALL-PYTHON.sh`.
 
 Activate the toolchain in the current Git Bash, Bash or Zsh session:
 

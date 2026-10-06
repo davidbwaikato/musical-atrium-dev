@@ -110,11 +110,11 @@ case "$SCHWARZMAN_DEV_OS:$SCHWARZMAN_DEV_ARCH" in
 esac
 
 if [[ -n "$SCHWARZMAN_PY_ESSENTIA_REASON" ]]; then
-  printf 'Installing pinned TMA analysis packages...\n'
+  printf 'Installing TMA server, analysis and acquisition packages...\n'
   "$SCHWARZMAN_PY_VENV_EXE" -m pip install -r "$SCHWARZMAN_PY_SCRIPT_DIR/python-requirements.txt"
   printf 'WARNING: Not installing Essentia: %s.\n' "$SCHWARZMAN_PY_ESSENTIA_REASON" >&2
 else
-  printf 'Installing pinned TMA analysis packages and Essentia for %s-%s...\n' "$SCHWARZMAN_DEV_OS" "$SCHWARZMAN_DEV_ARCH"
+  printf 'Installing TMA server, analysis and acquisition packages with Essentia for %s-%s...\n' "$SCHWARZMAN_DEV_OS" "$SCHWARZMAN_DEV_ARCH"
   "$SCHWARZMAN_PY_VENV_EXE" -m pip install -r "$SCHWARZMAN_PY_SCRIPT_DIR/python-requirements.txt" --only-binary=essentia 'essentia==2.1b6.dev1389'
   "$SCHWARZMAN_PY_VENV_EXE" -c 'import essentia; import essentia.standard'
 fi
