@@ -1,11 +1,5 @@
-# The TMA Python environment installed by INSTALL-PYTHON.sh.
-# FastAPI serves the built frontend, API and music library.
-fastapi>=0.115,<1
-uvicorn>=0.30,<1
-python-dotenv>=1.0,<2
-
-# Audio/score analysis. Keep librosa 0.11 for Sync Toolbox's declared
-# compatibility range. Model weights download separately.
+# The baseline audio/score analysis environment. Keep librosa 0.11 for
+# Sync Toolbox's declared compatibility range. Model weights download separately.
 librosa==0.11.0
 synctoolbox==1.4.2
 demucs-infer==4.2.2
@@ -13,8 +7,10 @@ partitura==1.9.0
 parangonar==3.3.3
 pyloudnorm==0.1.1
 soundfile>=0.13,<1
-
 # YouTube acquisition: yt-dlp's default extra includes its EJS scripts. The
 # project-local Node.js is used to run them; imageio-ffmpeg supplies FFmpeg.
 yt-dlp[default]==2026.8.19
 imageio-ffmpeg==0.6.0
+
+# Pause/resume FFmpeg conversion consistently on Windows and POSIX.
+psutil>=6,<8
