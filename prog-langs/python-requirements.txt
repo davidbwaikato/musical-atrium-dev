@@ -2,6 +2,7 @@
 # FastAPI serves the built frontend, API and music library.
 fastapi>=0.115,<1
 uvicorn>=0.30,<1
+python-dotenv>=1.0,<2
 
 # Audio/score analysis. Keep librosa 0.11 for Sync Toolbox's declared
 # compatibility range. Model weights download separately.
